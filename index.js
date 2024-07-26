@@ -129,37 +129,63 @@ async function run() {
 
 
 
-   app.patch('/updateBooking/:id/:email',async (req, res) => {
+   app.patch('/updateBookinghall/:id',async (req, res) => {
       const hallId = req.params.id;
-      const email = req.params.email;
-
-      const { bookedDate, booking } = req.body;
-      const filter = {id: hallId}
-      const userFilter = {email}
+      const {  booking } = req.body;
+      const filter = {_id: new ObjectId(hallId) }
+     
       try {
        
         const update = { $push: { ["bookings"]: booking } };
         const result = await hallsCollection.updateOne(filter, update);
        
-        const updateDate = { $push: { ["bookedDates"]: bookedDate } };
-        const resultDate = await hallsCollection.updateOne(filter, updateDate);
-        
-        
-        const updateUser = { $push: { ["mybookings"]: update } };
-        const resultUser = await usersCollection.updateOne(userFilter, updateUser);
-
-
-        if (result.matchedCount === 0 && resultDate.matchedCount === 0 && resultUser.matchedCount === 0 ) {
+        if (result.matchedCount === 0  ) {
             return res.status(404).send({ message: 'halls not found' });
         }
-
-        
-        res.send({ message: 'Bookmarked successfully', result });
+        res.send({ message: 'Insert successfully', result });
     } catch (err) {
         res.status(500).send({ message: 'Internal server error', error: err });
     }
    })
 
+   app.patch('/updateBookingDate/:id',async (req, res) => {
+      const hallId = req.params.id;
+      const { bookedDate } = req.body;
+
+      const filter = {_id: new ObjectId(hallId) }
+      try {   
+        const updateDate = { $push: { ["bookedDates"]: bookedDate } };
+        const result = await hallsCollection.updateOne(filter, updateDate);
+    
+        if (result.matchedCount === 0  ) {
+            return res.status(404).send({ message: 'halls not found' });
+        }
+    
+        res.send({ message: 'Insert successfully', result});
+    } catch (err) {
+        res.status(500).send({ message: 'Internal server error', error: err });
+    }
+   })
+
+
+   app.patch('/updateBookingUser/:email',async (req, res) => {
+    const email = req.params.email;
+    const { booking } = req.body;
+
+    const userFilter = {email}
+    try {
+     const updateUser = { $push: { ["mybookings"]: booking } };
+     const result = await usersCollection.updateOne(userFilter, updateUser);
+
+      if (result.matchedCount === 0  ) {
+          return res.status(404).send({ message: 'halls not found' });
+      }
+      
+      res.send({ message: 'Insert successfully', result });
+  } catch (err) {
+      res.status(500).send({ message: 'Internal server error', error: err });
+  }
+ })
 
 
 
