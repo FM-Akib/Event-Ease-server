@@ -21,6 +21,15 @@ const client = new MongoClient(uri,{
   }
 });
 
+// Allow requests from 'http://localhost:5173'
+const corsOptions = {
+  origin: ['http://localhost:5173', 'https://event-ease-server-ten.vercel.app'],
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
+
+
 async function run() {
   try {
    
